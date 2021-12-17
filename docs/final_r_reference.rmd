@@ -1,0 +1,357 @@
+---
+title: "Final Project R Reference"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# R Reference Guide {.tabset .tabset-pills}
+
+
+## Loading Data and Packages
+
+### 
+
+##### To clear global environment 
+```{r}
+rm(list = ls())
+```
+### require & library
+###### Use `require` or `library` to load R packages within your directory.
+
+```{r}
+require(here)
+require(palmerpenguins)
+library(here)
+```
+
+### here
+###### Use `here` to find project files starting at your working directory.
+
+```{r}
+here("data", "ginkgo_data_2021.csv")
+```
+
+### Create data frame from .csv
+```{r}
+gingko = read.csv(here("data", "ginkgo_data_2021.csv"))
+
+summary(gingko)
+```
+
+
+## Data Structures
+
+
+### c()
+
+***
+
+##### The function `c()` combines or concatenates its arguments into a vector (a 1-dimensional data structure consisting of 1 or more elements).
+
+* All of the elements must be of the same type.
+* I can’t combine character and numeric types in the same call to c()
+
+Here are two examples using numeric and character data types:
+
+```{r}
+## Create a vector of numbers:
+num_vec  = c(1, 4, 8, 9, 13)
+
+## Create a vector of characters:
+char_vec = c("a", "fish", "data is cool")
+```
+
+Show the contents of a vector by typing the name of the vector, or using the print() function.
+
+```{r}
+## Typing the name of the vector into the console prints the contents
+num_vec
+```
+
+```{r}
+## The print() function accomplishes the same task:
+print(char_vec)
+```
+
+### length()
+
+***
+
+##### `Length()` retrieves the length of vectors, lists, and factors. It can be applied to one column or row of a dataset, or any other string of factors, lists, or wherever a vector may appear. 
+
+The following example retrieves the number of values in the vector:
+
+```{r}
+length(c(1, 6, 4, 8, 9, 6, 55, 6, 7, 88))
+```
+
+The following example returns the number of observations under the "species" column.
+
+```{r}
+require(palmerpenguins)
+length(penguins$species)
+```
+
+### matrix()
+       
+***
+
+###### To create a matrix: 
+
+Arguments: matrix(data = NA, nrow = 1, ncol = 1, byrow = FALSE,
+       dimnames = NULL)
+       
+* `data` is the data source (ex. `penguins` dataset) 
+* `nrow` is the row to select (or number of rows to create)
+* `ncol` is column to select (or number of columns to create)
+* `byrow = TRUE` orders by row, `FALSE` orders by column
+```{r}
+mat_1 <- matrix(1:20, 
+                ncol = 4,
+                )
+```
+
+
+
+```{r}
+
+```
+
+### nrow()
+
+`nrow` retrieves (or sets) the number of rows from a data frame 
+
+```{r}
+nrow(gingko)
+```
+
+### ncol()
+
+`ncol()` retrieves (or sets) the number of columns from a data frame
+
+```{r}
+ncol(gingko)
+```
+
+### dim()
+
+`dim` retrieves the dimensions of a vector or dataframe. `dimnames` sets names for rows and columns during matrix creation. 
+
+```{r}
+dim(gingko)
+```
+
+
+## Subsetting
+
+#### Subsetting retrieves specific values, rows, columns, characters, or variables from a dataset (ex. vector, matrix, or data frame). Subsetting can also be used to add or subtract fields to/from data frames, matrices, and vectors
+
+The following operations all perform subsetting. 
+
+### $
+
+```{r}
+summary(gingko$max_width)
+
+```
+
+### []
+
+Use `[]` to subset by position
+
+* Can be used on 2 and 3-Dimensional vectors
+
+```{r}
+gingko[1,] # select first row of the data frame
+gingko[2,3] # select the element in row 2, column 3
+head(gingko[, "max_width"]) #select the 3rd column of the data frame
+
+
+```
+
+
+### subset
+
+`subset` is a more versatile version of the operation that has the `droplevels` argument in case you need to remove subsets of variables or values from a data set. 
+
+```{r}
+penguins = palmerpenguins::penguins
+?subset
+head(subset(penguins, species == "Adelie"))
+```
+
+
+## Numerical Data Exploration
+
+### summary()
+
+Use `summary` to retrieve these values for a dataset:
+
+* minimum
+* 1st Quartile
+* Median
+* Mean
+* 3rd Quartile
+* Maximum
+```{r}
+summary(gingko$max_width)
+```
+
+### mean()
+
+Use `mean` to retrieve the mean value for a set of values
+
+```{r}
+mean(gingko$max_width)
+```
+
+### sd()
+
+Use `sd` to retrieve the standard deviation of a set of values
+
+```{r}
+sd(gingko$max_width)
+```
+
+## Graphical Data Exploration
+
+### plot()
+
+### Use `plot()` to create scatterplots of variables
+
+```{r}
+
+par(mfrow = c(2, 2))
+
+plot(x = gingko$max_depth, y = gingko$max_width, 
+    col = "blue", #  Color 
+    pch = 4,  #  Point type 
+    cex = .75, #  Point size
+    main = "Gingko Leaf Depth and Width", # Header/Title
+    xlab = "Maximum Leaf Depth", # X-axis label
+    ylab = "Maximum Leaf Width", # Y-axis Label
+    xlim = c(1, 150), # X-axis range
+    ylim = c(0, 130),  # Y-axis range
+)
+
+hist(penguins$flipper_length_mm, main = "Penguin Flipper Lengths", 
+     xlab = "Frequency", 
+     ylab = "Flipper Length", 
+     breaks = 10, # Higher value = greater number of bins
+     col = "red", 
+     )
+
+boxplot(gingko$petiole_length, main = "Gingko Petiole Lengths",
+        ylab = "Petiole Lengths", 
+        col = "yellow")
+
+boxplot(formula = max_depth ~ seeds_present,
+        data = gingko, 
+        main = "Gingko Leaf Depth Conditioned on Petiole Length",
+        ylab = "Leaf Depth",
+        xlab = "Seed Prescence",
+        ls = 2)
+
+```
+
+### hist()
+
+Use `hist()` to create a histogram from given data
+
+
+```{r}
+
+hist(penguins$flipper_length_mm, main = "Penguin Flipper Lengths", 
+     xlab = "Frequency", 
+     ylab = "Flipper Length", 
+     breaks = 10, # Higher value = greater number of bins
+     col = "red", 
+     xlim = c(170, 240)
+     )
+
+```
+
+### boxplot
+
+Use `boxplot()` to create boxplots of given data. 
+
+```{r}
+
+boxplot(gingko$petiole_length, main = "Gingko Petiole Lengths",
+        ylab = "Petiole Lengths", 
+        col = "yellow")
+
+boxplot(formula = max_depth ~ seeds_present,
+        data = gingko, 
+        main = "Gingko Leaf Depth Conditioned on Petiole Length",
+        ylab = "Leaf Depth",
+        xlab = "Seed Prescence",
+        ls = 2)
+
+```
+
+## Distribution Functions
+
+### Normal Distribution
+
+* `dnorm` returns the density function for a normally distributed dataset 
+* `pnorm`returns the distribution function for a normally distributed dataset 
+* `qnorm` returns the quantile function for a normally distributed dataset 
+
+##### pnorm()
+
+`pnorm()` is a local function in R an is used retrieve the value of the cumulative density function for normally-distributed data using a given `mean`, and standard deviation `sd`
+
+`pnorm(q, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)`
+
+```{r}
+
+````
+
+##### qnorm()
+
+`qnorm(p, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)`
+
+```{r}
+
+````
+
+
+
+### Binomial Distribution 
+
+* `dbinom` returns the density function for a normally distributed dataset 
+* `pbinom`returns the distribution function for a normally distributed dataset 
+* `qbinom` returns the quantile function for a normally distributed dataset 
+
+##### dbinom()
+
+`dbinom(x, size, prob, log = FALSE)`
+
+```{r}
+
+dbinom(0, 6, 2/3)
+
+````
+
+
+##### pbinom()
+
+`pbinom(q, size, prob, lower.tail = TRUE, log.p = FALSE)`
+
+```{r}
+pbinom(4, 6, 2/3)
+````
+
+##### qbinom()
+
+`qbinom(p, size, prob, lower.tail = TRUE, log.p = FALSE)`
+
+```{r}
+
+````
+
+
