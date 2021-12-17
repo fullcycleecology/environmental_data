@@ -7,4 +7,6 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+[Final Project: R Reference Guide](final_R_reference.html)
+
 Welcome to John's class page! 
